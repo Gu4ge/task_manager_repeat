@@ -1,0 +1,133 @@
+#include "TaskManager.h"
+
+void TaskManager::addTask(const std::string &task)
+{
+    Task new_task;
+    new_task.id = last_id;
+    new_task.title = task;
+    new_task.completed = false;
+    tasks_.push_back(new_task);
+    last_id++;
+}
+
+void TaskManager::removeTask(int id)
+{
+    auto new_end = std::remove_if(tasks_.begin(), tasks_.end(),
+                                  [id](const Task &target)
+                                  {
+                                      return target.id == id;
+                                  });
+    tasks_.erase(new_end, tasks_.end());
+}
+void TaskManager::completeTask(int id)
+{
+    auto task = findTask(id);
+    if (task != nullptr)
+    {
+        task->completed = true;
+    }
+}
+
+void TaskManager::printTasks() const
+{
+    for (const Task &i : tasks_)
+    {
+        std::cout << "id: " << i.id << " task: " << i.title << " completed: " << i.completed << std::endl;
+    }
+}
+
+const Task *TaskManager::findTask(int id) const
+{
+    auto it = std::find_if(tasks_.begin(), tasks_.end(), [id](const Task &target)
+                           { return target.id == id; });
+    if (it == tasks_.end())
+    {
+        return nullptr;
+    }
+    return &(*it);
+}
+
+Task *TaskManager::findTask(int id)
+{
+    auto it = std::find_if(tasks_.begin(), tasks_.end(), [id](const Task &target)
+                           { return target.id == id; });
+    if (it == tasks_.end())
+    {
+        return nullptr;
+    }
+    return &(*it);
+}
+void TaskManager::renameTask(int id, const std::string &newTitle)
+{
+    auto target = findTask(id);
+    if (target != nullptr)
+    {
+        target->title = newTitle;
+    }
+}
+
+std::vector<Task> TaskManager::getCompletedTasks() const
+{
+    std::vector<Task> comleted_task;
+    for (const auto &i : tasks_)
+    {
+        if (i.completed)
+        {
+            comleted_task.push_back(i);
+        }
+    }
+    return comleted_task;
+}
+
+std::vector<Task> TaskManager::getPendingTasks() const
+{
+    std::vector<Task> pending_tasks;
+    for (const auto &i : tasks_)
+    {
+        if (!i.completed)
+        {
+            pending_tasks.push_back(i);
+        }
+    }
+    return pending_tasks;
+}
+
+void TaskManager::saveToFile(const std::string &filename) const
+{
+    std::ofstream file(filename, std::ios_base::out);
+    if (file.is_open())
+    {
+        for (const auto &task : tasks_)
+        {
+            file << task.id << '|' << task.title << '|' << task.completed << '\n';
+        }
+    }
+    file.close();
+}
+
+void TaskManager::loadFromFile(const std::string &filename)
+{
+    std::ifstream file(filename, std::ios_base::in);
+    std::string id, title, completed;
+    if (file.is_open())
+    {
+        while (std::getline(file, id, '|'))
+        {
+            std::getline(file, title, '|');
+            std::getline(file, completed);
+            Task new_task;
+            new_task.id = std::stoi(id);
+            new_task.title = title;
+            new_task.completed = (completed == "1" ? true : false);
+            tasks_.push_back(new_task);
+        }
+    }
+    if (!tasks_.empty())
+    {
+        auto it = std::max_element(tasks_.begin(), tasks_.end(), [](const Task &lhs, const Task &rhs)
+                                   { return lhs.id < rhs.id; });
+        last_id = it->id + 1;
+    }
+    file.close();
+}
+
