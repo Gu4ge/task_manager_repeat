@@ -2,6 +2,10 @@
 
 void TaskManager::addTask(const std::string &task)
 {
+    if (isValidTitle(task) != true)
+    {
+        throw std::invalid_argument("Task title cannot contain '|'");
+    }
     Task new_task;
     new_task.id = last_id;
     new_task.title = task;
@@ -59,6 +63,10 @@ Task *TaskManager::findTask(int id)
 }
 void TaskManager::renameTask(int id, const std::string &newTitle)
 {
+    if (isValidTitle(newTitle) != true)
+    {
+        throw std::invalid_argument("Task title cannot contain '|'");
+    }
     auto target = findTask(id);
     if (target != nullptr)
     {
@@ -108,26 +116,57 @@ void TaskManager::saveToFile(const std::string &filename) const
 void TaskManager::loadFromFile(const std::string &filename)
 {
     std::ifstream file(filename, std::ios_base::in);
-    std::string id, title, completed;
+    std::string id, title, completed, line;
+    std::vector<Task> buff;
     if (file.is_open())
     {
-        while (std::getline(file, id, '|'))
+        while (std::getline(file, line))
         {
-            std::getline(file, title, '|');
-            std::getline(file, completed);
+            auto first = line.find_first_of('|');
+            auto second = line.find_last_of('|');
+
+            if(first == second || first == std::string::npos){
+                throw std::invalid_argument("wrong line");
+            }
+
+            id = line.substr(0, first);
+            title = line.substr(first+1, second-first-1);
+            completed = line.substr(second+1);
+
+            if (isValidTitle(title) != true)
+            {
+                throw std::invalid_argument("Task title cannot contain '|'");
+            }
+
+            if(isValidCompleted(completed) != true){
+                throw std::invalid_argument("Task completed must be '0' or '1'");
+            }
+
             Task new_task;
             new_task.id = std::stoi(id);
             new_task.title = title;
             new_task.completed = (completed == "1" ? true : false);
-            tasks_.push_back(new_task);
+            buff.push_back(new_task);
         }
     }
-    if (!tasks_.empty())
+    if (!buff.empty())
     {
-        auto it = std::max_element(tasks_.begin(), tasks_.end(), [](const Task &lhs, const Task &rhs)
+        auto it = std::max_element(buff.begin(), buff.end(), [](const Task &lhs, const Task &rhs)
                                    { return lhs.id < rhs.id; });
         last_id = it->id + 1;
     }
+    else{
+        last_id = 0;
+    }
     file.close();
+    tasks_ = std::move(buff);
+}
+
+bool TaskManager::isValidTitle(const std::string &title) const
+{
+    return !title.empty();
+}
+bool TaskManager::isValidCompleted(const std::string& completed) const{
+    return (completed == "1" || completed == "0");
 }
 

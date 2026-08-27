@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 
+
 struct Task
 {
     int id;
@@ -30,6 +31,9 @@ public:
     void loadFromFile(const std::string &filename);
 
 private:
+    bool isValidTitle(const std::string& title) const;
+    bool isValidCompleted(const std::string& completed) const;
+    
     std::vector<Task> tasks_;
     int last_id = 0;
 };

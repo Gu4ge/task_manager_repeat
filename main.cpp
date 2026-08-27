@@ -120,5 +120,16 @@ int main()
         manager.loadFromFile("tasks.txt");
         manager.printTasks();
     }
+
+    {
+        TaskManager manager;
+
+        manager.addTask("Buy | milk");
+        manager.saveToFile("tasks.txt");
+
+        TaskManager loaded;
+        loaded.loadFromFile("tasks.txt");
+        loaded.printTasks();
+    }
     return 0;
 }
