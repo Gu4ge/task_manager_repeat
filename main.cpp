@@ -2,134 +2,20 @@
 
 int main()
 {
+  
+
     {
         TaskManager manager;
 
-        manager.addTask("Learn C++");
-        manager.addTask("Write MyVector");
-        manager.addTask("Learn STL");
+        manager.addTask("Existing A"); // 0
+        manager.addTask("Existing B"); // 1
+
+        manager.loadFromFile("tasks.txt", LoadMode::Append);
 
         manager.printTasks();
-    }
 
-    {
-        TaskManager manager;
-
-        manager.addTask("A");
-        manager.addTask("B");
-        manager.addTask("C");
-
-        manager.removeTask(1);
-
+        manager.addTask("After append");
         manager.printTasks();
-    }
-
-    {
-        TaskManager manager;
-
-        manager.addTask("Learn C++");
-        manager.addTask("Write MyVector");
-
-        const Task *task = manager.findTask(1);
-
-        if (task)
-        {
-            std::cout << task->title << '\n';
-        }
-
-        manager.renameTask(1, "Write MyVector properly");
-        manager.printTasks();
-
-        manager.renameTask(100, "Nothing");
-        manager.printTasks();
-    }
-
-    {
-        TaskManager manager;
-
-        manager.addTask("Learn C++");
-
-        const Task *task = manager.findTask(100);
-
-        if (task)
-        {
-            std::cout << task->title << '\n';
-        }
-        else
-        {
-            std::cout << "Task not found\n";
-        }
-    }
-
-    {
-        TaskManager manager;
-
-        manager.addTask("A");
-        manager.addTask("B");
-        manager.addTask("C");
-
-        manager.completeTask(1);
-
-        auto completed = manager.getCompletedTasks();
-        auto pending = manager.getPendingTasks();
-
-        std::cout << "completed: " << completed.size() << '\n';
-        std::cout << "pending: " << pending.size() << '\n';
-    }
-
-    {
-        TaskManager manager;
-
-        manager.addTask("A");
-        manager.addTask("B");
-
-        Task *task = manager.findTask(1);
-
-        if (task)
-        {
-            task->title = "Changed";
-        }
-
-        manager.printTasks();
-    }
-
-    {
-        const TaskManager manager;
-
-        const Task *task = manager.findTask(100);
-
-        if (!task)
-        {
-            std::cout << "Not found\n";
-        }
-    }
-
-    {
-        TaskManager manager;
-
-        manager.addTask("Learn C++");
-        manager.addTask("Write MyVector");
-        manager.completeTask(1);
-
-        manager.saveToFile("tasks.txt");
-    }
-
-    {
-        TaskManager manager;
-
-        manager.loadFromFile("tasks.txt");
-        manager.printTasks();
-    }
-
-    {
-        TaskManager manager;
-
-        manager.addTask("Buy | milk");
-        manager.saveToFile("tasks.txt");
-
-        TaskManager loaded;
-        loaded.loadFromFile("tasks.txt");
-        loaded.printTasks();
     }
     return 0;
 }

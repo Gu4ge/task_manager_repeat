@@ -113,9 +113,10 @@ void TaskManager::saveToFile(const std::string &filename) const
     file.close();
 }
 
-void TaskManager::loadFromFile(const std::string &filename)
+void TaskManager::loadFromFile(const std::string &filename, LoadMode mode)
 {
     std::ifstream file(filename, std::ios_base::in);
+
     std::string id, title, completed, line;
     std::vector<Task> buff;
     if (file.is_open())
@@ -125,20 +126,22 @@ void TaskManager::loadFromFile(const std::string &filename)
             auto first = line.find_first_of('|');
             auto second = line.find_last_of('|');
 
-            if(first == second || first == std::string::npos){
+            if (first == second || first == std::string::npos)
+            {
                 throw std::invalid_argument("wrong line");
             }
 
             id = line.substr(0, first);
-            title = line.substr(first+1, second-first-1);
-            completed = line.substr(second+1);
+            title = line.substr(first + 1, second - first - 1);
+            completed = line.substr(second + 1);
 
             if (isValidTitle(title) != true)
             {
                 throw std::invalid_argument("Task title cannot contain '|'");
             }
 
-            if(isValidCompleted(completed) != true){
+            if (isValidCompleted(completed) != true)
+            {
                 throw std::invalid_argument("Task completed must be '0' or '1'");
             }
 
@@ -149,24 +152,82 @@ void TaskManager::loadFromFile(const std::string &filename)
             buff.push_back(new_task);
         }
     }
-    if (!buff.empty())
+    // буффер заполнен из файла
+    if (mode == LoadMode::Replace)
     {
-        auto it = std::max_element(buff.begin(), buff.end(), [](const Task &lhs, const Task &rhs)
-                                   { return lhs.id < rhs.id; });
-        last_id = it->id + 1;
+        if (buff.empty())
+        {
+            tasks_.clear();
+            last_id = 0;
+        }
+        else
+        {
+            tasks_ = std::move(buff);
+            auto it = findMaxElement(tasks_);
+            last_id = it->id + 1;
+        }
     }
-    else{
-        last_id = 0;
+    else
+    {
+        if (!buff.empty())
+        {
+            auto it = findMaxElement(tasks_);
+
+            if (it != nullptr)
+                last_id = it->id + 1;
+
+            for (auto &task : buff)
+            {
+                if (!IsEqualId(task.id))
+                {
+                    task.id = last_id;
+                    ++last_id;
+                }
+            }
+
+            tasks_.reserve(tasks_.size() + buff.size());
+            tasks_.insert(
+                tasks_.end(),
+                std::make_move_iterator(buff.begin()),
+                std::make_move_iterator(buff.end()));
+        }
     }
     file.close();
-    tasks_ = std::move(buff);
 }
 
 bool TaskManager::isValidTitle(const std::string &title) const
 {
     return !title.empty();
 }
-bool TaskManager::isValidCompleted(const std::string& completed) const{
+bool TaskManager::isValidCompleted(const std::string &completed) const
+{
     return (completed == "1" || completed == "0");
 }
 
+bool TaskManager::IsEqualId(int id) const
+{
+    for (const auto &task : tasks_)
+    {
+        if (task.id == id)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+const Task *findMaxElement(const std::vector<Task> &vec)
+{
+    if (vec.empty())
+        return nullptr;
+
+    auto it = std::max_element(
+        vec.begin(),
+        vec.end(),
+        [](const Task &lhs, const Task &rhs)
+        {
+            return lhs.id < rhs.id;
+        });
+
+    return &(*it);
+}

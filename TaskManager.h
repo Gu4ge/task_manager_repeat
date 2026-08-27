@@ -5,7 +5,13 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <iterator>
 
+enum class LoadMode
+{
+    Replace,
+    Append
+};
 
 struct Task
 {
@@ -13,6 +19,9 @@ struct Task
     std::string title;
     bool completed;
 };
+
+
+const Task* findMaxElement(const std::vector<Task>& vec);
 
 class TaskManager
 {
@@ -28,12 +37,13 @@ public:
     std::vector<Task> getCompletedTasks() const;
     std::vector<Task> getPendingTasks() const;
     void saveToFile(const std::string &filename) const;
-    void loadFromFile(const std::string &filename);
+    void loadFromFile(const std::string &filename, LoadMode mode = LoadMode::Replace);
 
 private:
-    bool isValidTitle(const std::string& title) const;
-    bool isValidCompleted(const std::string& completed) const;
-    
+    bool isValidTitle(const std::string &title) const;
+    bool isValidCompleted(const std::string &completed) const;
+    bool IsEqualId(int id) const;
+
     std::vector<Task> tasks_;
     int last_id = 0;
 };
