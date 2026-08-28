@@ -13,6 +13,13 @@ enum class LoadMode
     Append
 };
 
+enum class SortMode
+{
+    Id,
+    Title,
+    Completed
+};
+
 struct Task
 {
     int id;
@@ -37,6 +44,13 @@ public:
     std::vector<Task> getPendingTasks() const;
     void saveToFile(const std::string &filename) const;
     void loadFromFile(const std::string &filename, LoadMode mode = LoadMode::Replace);
+    void sortTasks(SortMode mode);
+
+    template <class Compare>
+    void sortTasks(Compare comp)
+    {
+        std::sort(tasks_.begin(), tasks_.end(), comp);
+    }
 
 private:
     bool isValidTitle(const std::string &title) const;

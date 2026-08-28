@@ -174,11 +174,13 @@ void TaskManager::loadFromFile(const std::string &filename, LoadMode mode)
             auto it = findMaxElement(tasks_);
             auto maxbuffit = findMaxElement(buff);
 
-            if (it != nullptr){
+            if (it != nullptr)
+            {
                 auto supermax = std::max(it->id, maxbuffit->id);
                 last_id = supermax + 1;
             }
-            else{
+            else
+            {
                 last_id = maxbuffit->id + 1;
             }
 
@@ -243,4 +245,32 @@ const Task *findMaxElement(const std::vector<Task> &vec)
         });
 
     return &(*it);
+}
+
+void TaskManager::sortTasks(SortMode mode)
+{
+    switch (mode)
+    {
+    case SortMode::Id:
+    {
+        auto comp = [](const Task &lhs, const Task &rhs)
+        { return lhs.id < rhs.id; };
+        sortTasks(comp);
+        break;
+    }
+    case SortMode::Title:
+    {
+        auto comp = [](const Task &lhs, const Task &rhs)
+        { return lhs.title < rhs.title; };
+        sortTasks(comp);
+        break;
+    }
+    case SortMode::Completed:
+    {
+        auto comp = [](const Task &lhs, const Task &rhs)
+        { return lhs.completed < rhs.completed; };
+        sortTasks(comp);
+        break;
+    }
+    }
 }

@@ -162,27 +162,63 @@ int main()
     //     manager.printTasks();
     // }
 
+    // {
+    //     TaskManager manager;
+
+    //     manager.addTask("Existing A");
+
+    //     manager.loadFromFile("initial.txt", LoadMode::Replace);
+
+    //     std::cout << "Before append:\n";
+    //     manager.printTasks();
+
+    //     manager.loadFromFile("tasks.txt", LoadMode::Append);
+
+    //     std::cout << "\nAfter append:\n";
+    //     manager.printTasks();
+
+    //     manager.addTask("After append");
+
+    //     std::cout << "\nAfter new task:\n";
+    //     manager.printTasks();
+    // }
+
+    // {
+    //     TaskManager manager;
+
+    //     manager.addTask("Banana"); // id 0
+    //     manager.addTask("Apple");  // id 1
+    //     manager.addTask("Cherry"); // id 2
+
+    //     manager.completeTask(1);
+
+    //     std::cout << "=== Title ===\n";
+    //     manager.sortTasks(SortMode::Title);
+    //     manager.printTasks();
+
+    //     std::cout << "\n=== Id ===\n";
+    //     manager.sortTasks(SortMode::Id);
+    //     manager.printTasks();
+
+    //     std::cout << "\n=== Completed ===\n";
+    //     manager.sortTasks(SortMode::Completed);
+    //     manager.printTasks();
+    // }
+
     {
         TaskManager manager;
 
-        // Создаём id 0
-        manager.addTask("Existing A");
+        manager.addTask("Banana");
+        manager.addTask("Kiwi");
+        manager.addTask("Watermelon");
+        manager.addTask("Apple");
 
-        // Нужно получить существующий id 10.
-        // Самый простой способ для теста — загрузить его через Replace.
-        manager.loadFromFile("initial.txt", LoadMode::Replace);
+        manager.sortTasks(
+            [](const Task &lhs, const Task &rhs)
+            {
+                return lhs.title.size() < rhs.title.size();
+            });
 
-        std::cout << "Before append:\n";
-        manager.printTasks();
-
-        manager.loadFromFile("tasks.txt", LoadMode::Append);
-
-        std::cout << "\nAfter append:\n";
-        manager.printTasks();
-
-        manager.addTask("After append");
-
-        std::cout << "\nAfter new task:\n";
         manager.printTasks();
     }
     return 0;
