@@ -20,8 +20,7 @@ struct Task
     bool completed;
 };
 
-
-const Task* findMaxElement(const std::vector<Task>& vec);
+const Task *findMaxElement(const std::vector<Task> &vec);
 
 class TaskManager
 {
@@ -42,7 +41,7 @@ public:
 private:
     bool isValidTitle(const std::string &title) const;
     bool isValidCompleted(const std::string &completed) const;
-    bool IsEqualId(int id) const;
+    bool isIdUnique(int id, const std::vector<Task> &vec, size_t endIndex) const;
 
     std::vector<Task> tasks_;
     int last_id = 0;

@@ -172,15 +172,27 @@ void TaskManager::loadFromFile(const std::string &filename, LoadMode mode)
         if (!buff.empty())
         {
             auto it = findMaxElement(tasks_);
+            auto maxbuffit = findMaxElement(buff);
 
-            if (it != nullptr)
-                last_id = it->id + 1;
+            if (it != nullptr){
+                auto supermax = std::max(it->id, maxbuffit->id);
+                last_id = supermax + 1;
+            }
+            else{
+                last_id = maxbuffit->id + 1;
+            }
 
-            for (auto &task : buff)
+            for (size_t i = 0; i < buff.size(); ++i)
             {
-                if (!IsEqualId(task.id))
+                bool uniqueInTasks =
+                    isIdUnique(buff[i].id, tasks_, tasks_.size());
+
+                bool uniqueInBuff =
+                    isIdUnique(buff[i].id, buff, i);
+
+                if (!uniqueInTasks || !uniqueInBuff)
                 {
-                    task.id = last_id;
+                    buff[i].id = last_id;
                     ++last_id;
                 }
             }
@@ -204,15 +216,16 @@ bool TaskManager::isValidCompleted(const std::string &completed) const
     return (completed == "1" || completed == "0");
 }
 
-bool TaskManager::IsEqualId(int id) const
+bool TaskManager::isIdUnique(int id, const std::vector<Task> &vec, size_t endIndex) const
 {
-    for (const auto &task : tasks_)
+    for (size_t i = 0; i < endIndex; ++i)
     {
-        if (task.id == id)
+        if (vec[i].id == id)
         {
             return false;
         }
     }
+
     return true;
 }
 
