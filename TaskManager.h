@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
+#include <functional>
 
 enum class LoadMode
 {
@@ -37,6 +38,14 @@ public:
     void removeTask(int id);
     void completeTask(int id);
     void printTasks() const;
+
+    template<class Predicate>
+    std::vector<Task> findTasks(Predicate pred) const{
+        std::vector<Task> result;
+        std::copy_if(tasks_.begin(), tasks_.end(), std::back_inserter(result), pred);
+        return result;
+    }
+
     const Task *findTask(int id) const;
     Task *findTask(int id);
     void renameTask(int id, const std::string &newTitle);
@@ -45,6 +54,7 @@ public:
     void saveToFile(const std::string &filename) const;
     void loadFromFile(const std::string &filename, LoadMode mode = LoadMode::Replace);
     void sortTasks(SortMode mode);
+    void sortTasks(std::function<bool(const Task&, const Task&)> comp);
 
     template <class Compare>
     void sortTasks(Compare comp)

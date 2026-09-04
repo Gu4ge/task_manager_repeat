@@ -274,3 +274,7 @@ void TaskManager::sortTasks(SortMode mode)
     }
     }
 }
+
+void TaskManager::sortTasks(std::function<bool(const Task&, const Task&)> comp){
+    std::sort(tasks_.begin(), tasks_.end(), comp);
+}
