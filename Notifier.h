@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 #include <memory>
+#include <cctype>
+#include <algorithm>
 
 enum NotifierType{email, sms, console};
 
@@ -31,3 +33,4 @@ public:
 };
 
 std::unique_ptr<Notifier> createNotifier(NotifierType type);
+std::unique_ptr<Notifier> createNotifier(const std::string& type);
