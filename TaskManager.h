@@ -59,13 +59,27 @@ public:
     TaskManager() = default;
     TaskManager(std::unique_ptr<Notifier> notifier);
     void setNotifier(std::unique_ptr<Notifier> notifier);
+    bool removeNotifier(std::size_t index);
     void addTask(const std::string &task, Priority priority = Priority::Medium);
     void removeTask(int id);
     void completeTask(int id);
+    void completeAllTasks();
+    std::size_t countIncompleteTasks() const;
+    std::size_t countTasksByPriority(Priority priority) const;
+    std::size_t countCompletedTasks() const;
     void printTasks() const;
     bool hasUniqueIds() const;
     void setPriority(int id, Priority priority);
     void setDeadline(int id, std::chrono::system_clock::time_point deadline);
+    void clearDeadline(int id);
+    void addNotifier(std::unique_ptr<Notifier> notifier);
+    std::size_t notifierCount() const;
+    bool hasNotifiers() const;
+    void clearNotifiers();
+    const Notifier* getNotifier(std::size_t index) const;
+    bool replaceNotifier(std::size_t index, std::unique_ptr<Notifier> notifier);
+    void notifyOverdueTasks() const;
+    void notifyAll(const std::string& message) const;
 
     template <class Predicate>
     std::vector<Task> findTasks(Predicate pred) const
@@ -101,9 +115,9 @@ private:
     bool isPriorityValid(const std::string &priority) const;
     bool isOverdue(int id) const;
     std::string priorityToString(Priority priority) const;
-    std::string deadlineToString(const std::optional<std::chrono::system_clock::time_point>& deadline) const;
+    std::string deadlineToString(const std::optional<std::chrono::system_clock::time_point> &deadline) const;
 
-    std::unique_ptr<Notifier> notifier_;
+    std::vector<std::unique_ptr<Notifier>> notifiers_;
     std::vector<Task> tasks_;
     int last_id = 0;
 };

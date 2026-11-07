@@ -1,6 +1,6 @@
 #include "Notifier.h"
 
-std::unique_ptr<Notifier> createNotifier(NotifierType type)
+std::unique_ptr<Notifier> createNotifier(NotifierType type, const std::string& filename)
 {
     switch (type)
     {
@@ -10,11 +10,13 @@ std::unique_ptr<Notifier> createNotifier(NotifierType type)
         return std::make_unique<SmsNotifier>();
     case NotifierType::console:
         return std::make_unique<ConsoleNotifier>();
+    case NotifierType::file:
+        return std::make_unique<FileNotifier>(filename);
     }
     return nullptr;
 }
 
-std::unique_ptr<Notifier> createNotifier(const std::string &type)
+std::unique_ptr<Notifier> createNotifier(const std::string &type, const std::string& filename)
 {
     std::string normalizedType = type;
     std::transform(normalizedType.begin(), normalizedType.end(), normalizedType.begin(), [](unsigned char c)
@@ -30,6 +32,10 @@ std::unique_ptr<Notifier> createNotifier(const std::string &type)
     else if (normalizedType == "console")
     {
         return createNotifier(NotifierType::console);
+    }
+    else if (normalizedType == "file")
+    {
+        return createNotifier(NotifierType::file, filename);
     }
     else
     {
@@ -50,4 +56,23 @@ void SmsNotifier::Send(const std::string &text) const
 void ConsoleNotifier::Send(const std::string &text) const
 {
     std::cout << "Console: " << text << std::endl;
+}
+
+FileNotifier::FileNotifier(const std::string& filename) : filename_(filename){}
+
+void FileNotifier::Send(const std::string& text) const
+{
+    std::ofstream file(filename_, std::ios_base::app);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Failed to open file: " + filename_);
+    }
+
+    file << text << std::endl;
+
+    if (!file)
+    {
+        throw std::runtime_error("Failed to write file: " + filename_);
+    }
 }

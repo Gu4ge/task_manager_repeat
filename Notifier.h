@@ -4,8 +4,9 @@
 #include <memory>
 #include <cctype>
 #include <algorithm>
+#include <fstream>
 
-enum NotifierType{email, sms, console};
+enum NotifierType{email, sms, console, file};
 
 class Notifier
 {
@@ -32,5 +33,14 @@ public:
     void Send(const std::string& text) const override;
 };
 
-std::unique_ptr<Notifier> createNotifier(NotifierType type);
-std::unique_ptr<Notifier> createNotifier(const std::string& type);
+class FileNotifier : public Notifier
+{
+public:
+    explicit FileNotifier(const std::string& filename = "events.log");
+     void Send(const std::string& text) const override;
+private:
+    std::string filename_;
+};
+
+std::unique_ptr<Notifier> createNotifier(NotifierType type, const std::string& filename = "events.log");
+std::unique_ptr<Notifier> createNotifier(const std::string& type, const std::string& filename = "events.log");
