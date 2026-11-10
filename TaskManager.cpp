@@ -95,6 +95,18 @@ void TaskManager::notifyOverdueTasks() const
     }
 }
 
+bool TaskManager::hasNoOverdueTasks() const
+{
+    return std::none_of(tasks_.begin(), tasks_.end(), [this](const Task &task)
+                        { return isOverdue(task.id); });
+}
+
+std::size_t TaskManager::countOverdueTasks() const{
+    return std::count_if(tasks_.begin(), tasks_.end(), [this](const Task& task){
+        return this->isOverdue(task.id); 
+    });
+}
+
 void TaskManager::notifyAll(const std::string &message) const
 {
     for (const auto &notifier : notifiers_)
@@ -156,14 +168,89 @@ std::size_t TaskManager::countIncompleteTasks() const
         });
 }
 
-std::size_t TaskManager::countTasksByPriority(Priority priority) const{
-    return std::count_if(tasks_.begin(), tasks_.end(), [priority](const Task& task){
-        return task.priority == priority;
-    });
+std::size_t TaskManager::countTasksByPriority(Priority priority) const
+{
+    return std::count_if(tasks_.begin(), tasks_.end(), [priority](const Task &task)
+                         { return task.priority == priority; });
 }
 
-std::size_t TaskManager::countCompletedTasks() const{
+std::size_t TaskManager::countCompletedTasks() const
+{
     return tasks_.size() - countIncompleteTasks();
+}
+
+const Task *TaskManager::findFirstIncompleteTask() const
+{
+    const auto incompleteTask = std::find_if(tasks_.begin(), tasks_.end(), [](const Task &task)
+                                             { return task.completed == false; });
+    if (incompleteTask == tasks_.end())
+    {
+        return nullptr;
+    }
+    return &(*incompleteTask);
+}
+
+Task *TaskManager::findFirstIncompleteTask()
+{
+    auto incompleteTask = std::find_if(tasks_.begin(), tasks_.end(), [](const Task &task)
+                                       { return task.completed == false; });
+    if (incompleteTask == tasks_.end())
+    {
+        return nullptr;
+    }
+    return &(*incompleteTask);
+}
+
+Task *TaskManager::findFirstTaskByPriority(Priority priority)
+{
+    auto taskByPriority = std::find_if(tasks_.begin(), tasks_.end(), [priority](const Task &task)
+                                       { return task.priority == priority; });
+    if (taskByPriority == tasks_.end())
+    {
+        return nullptr;
+    }
+    return &(*taskByPriority);
+}
+
+Task *TaskManager::findLastIncompleteTask()
+{
+    auto incompleteTask = std::find_if(tasks_.rbegin(), tasks_.rend(), [](const Task &task)
+                                       { return task.completed == false; });
+    if (incompleteTask == tasks_.rend())
+    {
+        return nullptr;
+    }
+    return &(*incompleteTask);
+}
+
+bool TaskManager::hasIncompleteTasks() const
+{
+    return std::any_of(tasks_.begin(), tasks_.end(), [](const Task &task)
+                       { return task.completed == false; });
+}
+
+bool TaskManager::areAllTasksCompleted() const
+{
+
+    return !tasks_.empty() &&
+           std::all_of(
+               tasks_.begin(),
+               tasks_.end(),
+               [](const Task &task)
+               {
+                   return task.completed;
+               });
+}
+
+Task *TaskManager::findLastTaskByPriority(Priority priority)
+{
+    auto taskByPriority = std::find_if(tasks_.rbegin(), tasks_.rend(), [priority](const Task &task)
+                                       { return task.priority == priority; });
+    if (taskByPriority == tasks_.rend())
+    {
+        return nullptr;
+    }
+    return &(*taskByPriority);
 }
 
 void TaskManager::printTasks() const

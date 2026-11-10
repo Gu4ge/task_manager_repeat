@@ -1,6 +1,6 @@
 #include "Notifier.h"
 
-std::unique_ptr<Notifier> createNotifier(NotifierType type, const std::string& filename)
+std::unique_ptr<Notifier> createNotifier(NotifierType type, const std::string &filename)
 {
     switch (type)
     {
@@ -16,7 +16,7 @@ std::unique_ptr<Notifier> createNotifier(NotifierType type, const std::string& f
     return nullptr;
 }
 
-std::unique_ptr<Notifier> createNotifier(const std::string &type, const std::string& filename)
+std::unique_ptr<Notifier> createNotifier(const std::string &type, const std::string &filename)
 {
     std::string normalizedType = type;
     std::transform(normalizedType.begin(), normalizedType.end(), normalizedType.begin(), [](unsigned char c)
@@ -42,7 +42,7 @@ std::unique_ptr<Notifier> createNotifier(const std::string &type, const std::str
         return nullptr;
     }
 }
- 
+
 void EmailNotifier::Send(const std::string &text) const
 {
     std::cout << "Email: " << text << std::endl;
@@ -58,9 +58,9 @@ void ConsoleNotifier::Send(const std::string &text) const
     std::cout << "Console: " << text << std::endl;
 }
 
-FileNotifier::FileNotifier(const std::string& filename) : filename_(filename){}
+FileNotifier::FileNotifier(const std::string &filename) : filename_(filename) {}
 
-void FileNotifier::Send(const std::string& text) const
+void FileNotifier::Send(const std::string &text) const
 {
     std::ofstream file(filename_, std::ios_base::app);
 

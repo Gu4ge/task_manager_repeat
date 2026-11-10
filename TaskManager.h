@@ -67,6 +67,13 @@ public:
     std::size_t countIncompleteTasks() const;
     std::size_t countTasksByPriority(Priority priority) const;
     std::size_t countCompletedTasks() const;
+    const Task *findFirstIncompleteTask() const;
+    Task *findFirstIncompleteTask();
+    Task *findFirstTaskByPriority(Priority priority);
+    Task *findLastIncompleteTask();
+    Task *findLastTaskByPriority(Priority priority);
+    bool hasIncompleteTasks() const;
+    bool areAllTasksCompleted() const;
     void printTasks() const;
     bool hasUniqueIds() const;
     void setPriority(int id, Priority priority);
@@ -76,10 +83,12 @@ public:
     std::size_t notifierCount() const;
     bool hasNotifiers() const;
     void clearNotifiers();
-    const Notifier* getNotifier(std::size_t index) const;
+    const Notifier *getNotifier(std::size_t index) const;
     bool replaceNotifier(std::size_t index, std::unique_ptr<Notifier> notifier);
     void notifyOverdueTasks() const;
-    void notifyAll(const std::string& message) const;
+    bool hasNoOverdueTasks() const;
+    std::size_t countOverdueTasks() const;
+    void notifyAll(const std::string &message) const;
 
     template <class Predicate>
     std::vector<Task> findTasks(Predicate pred) const
