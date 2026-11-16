@@ -41,6 +41,12 @@ enum class Priority
 
 struct Task
 {
+    Task() = default;
+    Task &operator=(const Task &other) = default;
+    Task &operator=(Task &&other) noexcept = default;
+    Task(const Task &other);
+    Task(Task &&other) noexcept;
+    ~Task() = default;
     int id;
     std::string title;
     bool completed;
@@ -58,6 +64,7 @@ class TaskManager
 public:
     TaskManager() = default;
     TaskManager(std::unique_ptr<Notifier> notifier);
+
     void setNotifier(std::unique_ptr<Notifier> notifier);
     bool removeNotifier(std::size_t index);
     void addTask(const std::string &task, Priority priority = Priority::Medium);
@@ -116,12 +123,15 @@ public:
 
     std::vector<Task> getOverdueTasks() const;
 
+    void printMemoryInfo() const;
+
 private:
     bool isValidTitle(const std::string &title) const;
     bool isValidCompleted(const std::string &completed) const;
     bool isIdUnique(int id, const std::vector<Task> &vec, size_t endIndex) const;
     bool isIdValid(const std::string &idStr) const;
     bool isPriorityValid(const std::string &priority) const;
+    bool isPriorityValid(Priority priority) const;
     bool isOverdue(int id) const;
     std::string priorityToString(Priority priority) const;
     std::string deadlineToString(const std::optional<std::chrono::system_clock::time_point> &deadline) const;

@@ -12,7 +12,7 @@ void TaskManager::addTask(const std::string &task, Priority priority)
         throw std::invalid_argument("Invalid task title");
     }
 
-    if (!isPriorityValid(priorityToString(priority)))
+    if (!isPriorityValid(priority))
     {
         throw std::invalid_argument("Invalid priority");
     }
@@ -101,10 +101,10 @@ bool TaskManager::hasNoOverdueTasks() const
                         { return isOverdue(task.id); });
 }
 
-std::size_t TaskManager::countOverdueTasks() const{
-    return std::count_if(tasks_.begin(), tasks_.end(), [this](const Task& task){
-        return this->isOverdue(task.id); 
-    });
+std::size_t TaskManager::countOverdueTasks() const
+{
+    return std::count_if(tasks_.begin(), tasks_.end(), [this](const Task &task)
+                         { return this->isOverdue(task.id); });
 }
 
 void TaskManager::notifyAll(const std::string &message) const
@@ -603,7 +603,7 @@ bool TaskManager::hasUniqueIds() const
 
 void TaskManager::setPriority(int id, Priority priority)
 {
-    if (isPriorityValid(priorityToString(priority)))
+    if (isPriorityValid(priority))
     {
         auto task = findTask(id);
 
@@ -641,6 +641,13 @@ bool TaskManager::isPriorityValid(const std::string &priorityStr) const
     return priorityStr == "0" ||
            priorityStr == "1" ||
            priorityStr == "2";
+}
+
+bool TaskManager::isPriorityValid(Priority priority) const
+{
+    return priority == Priority::Low ||
+           priority == Priority::Medium ||
+           priority == Priority::High;
 }
 
 void TaskManager::setDeadline(
@@ -683,6 +690,15 @@ std::vector<Task> TaskManager::getOverdueTasks() const
                    task.deadline.has_value() &&
                    *task.deadline < now;
         });
+}
+
+void TaskManager::printMemoryInfo() const
+{
+    std::cout << "Size: " << tasks_.size() << '\n'
+              << "Capacity: " << tasks_.capacity() << '\n'
+              << "Address: " << tasks_.data() << '\n'
+              << "Task size: " << sizeof(Task) << '\n'
+              << "----------------------\n";
 }
 
 std::string TaskManager::deadlineToString(
@@ -730,4 +746,22 @@ bool Task::operator==(const Task &other) const
 bool Task::operator!=(const Task &other) const
 {
     return !(*this == other);
+}
+
+Task::Task(const Task &other)
+    : id(other.id),
+      title(other.title),
+      completed(other.completed),
+      deadline(other.deadline),
+      priority(other.priority)
+{
+}
+
+Task::Task(Task &&other) noexcept
+    : id(other.id),
+      title(std::move(other.title)),
+      completed(other.completed),
+      deadline(std::move(other.deadline)),
+      priority(other.priority)
+{
 }
